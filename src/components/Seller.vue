@@ -90,10 +90,6 @@ export default {
                                     color: '#AB6EE5'
                                 }
                             ])
-                        },
-                        universalTransition: {
-                            enabled: true,
-                            seriesKey: ['商家8','商家9','商家11']
                         }
                     }
                 ]
