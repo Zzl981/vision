@@ -19,9 +19,19 @@ export default {
             Timer: null
         }
     },
+    created() {
+        // 组件创建时注册回调函数
+        this.$socket.registerCallBack('rankData', this.getData)
+    },
     mounted() {
         this.initChart()
-        this.getData()
+        // this.getData()
+        this.$socket.send({
+            action: 'getData',
+            socketType: 'rankData',
+            chartName: 'rank',
+            value: ''
+        })
         // 监听浏览器窗口大小变化
         window.addEventListener('resize', this.screenAdapter)
         // 根据初始窗口大小自适应
@@ -31,6 +41,8 @@ export default {
         // 停止监听窗口变化，防止内存泄露
         window.removeEventListener('resize', this.screenAdapter)
         clearInterval(this.Timer)
+        // 组件销毁时取消回调函数
+        this.$socket.unRegisterCallBack("rankData")
     },
     methods: {
         // 初始化echarts对象
@@ -77,8 +89,8 @@ export default {
             })
         },
         // 从服务器获取数据
-        async getData() {
-            const { data: res } = await this.$http.get('/rank')
+        getData(res) {
+            // const { data: res } = await this.$http.get('/rank')
             this.Data = res
             this.Data.sort((a, b) => {
                 return b.value - a.value

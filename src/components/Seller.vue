@@ -16,10 +16,20 @@ export default {
             Timer: null
         }
     },
+    created() {
+        // 组件创建时注册回调函数
+        this.$socket.registerCallBack('sellerData', this.getData)
+    },
     // 页面开始加载时的调用的事件
     mounted() {
         this.initChart()
-        this.getData()
+        // this.getData()
+        this.$socket.send({
+            action: 'getData',
+            socketType: 'sellerData',
+            chartName: 'seller',
+            value: ''
+        })
         // 监听浏览器窗口大小变化
         window.addEventListener('resize', this.screenAdapter)
         // 根据初始窗口大小自适应
@@ -30,6 +40,8 @@ export default {
         clearInterval(this.Timer)
         // 停止监听窗口变化，防止内存泄露
         window.removeEventListener('resize', this.screenAdapter)
+        // 组件销毁时取消回调函数
+        this.$socket.unRegisterCallBack("sellerData")
     },
     methods: {
         // 初始化echarts对象
@@ -105,8 +117,8 @@ export default {
             })
         },
         // 从服务器获取数据
-        async getData() {
-            const { data: res } = await this.$http.get('/seller')
+        getData(res) {
+            // const { data: res } = await this.$http.get('/seller')
             this.Data = res
             // 从小到大排序
             this.Data.sort((a, b) => {

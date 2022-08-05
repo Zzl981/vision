@@ -15,9 +15,19 @@ export default {
             Timer: null
         }
     },
+    created() {
+        // 组件创建时注册回调函数
+        this.$socket.registerCallBack('stockData', this.getData)
+    },
     mounted() {
         this.initChart()
-        this.getData()
+        // this.getData()
+        this.$socket.send({
+            action: 'getData',
+            socketType: 'stockData',
+            chartName: 'stock',
+            value: ''
+        })
         // 监听浏览器窗口大小变化
         window.addEventListener('resize', this.screenAdapter)
         // 根据初始窗口大小自适应
@@ -27,6 +37,7 @@ export default {
         // 停止监听窗口变化，防止内存泄露
         window.removeEventListener('resize', this.screenAdapter)
         clearInterval(this.Timer)
+        this.$socket.unRegisterCallBack("stockData")
     },
     methods: {
         // 初始化echarts对象
@@ -48,10 +59,9 @@ export default {
             })
         },
         // 从服务器获取数据
-        async getData() {
-            const { data: res } = await this.$http.get('/stock')
+        getData(res) {
+            // const { data: res } = await this.$http.get('/stock')
             this.Data = res
-            console.log(res);
             // 获取数据后渲染到图表
             this.updateChart()
             this.startInterval()

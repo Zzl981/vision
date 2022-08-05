@@ -34,9 +34,19 @@ export default {
             }
         }
     },
+    created() {
+        // 组件创建时注册回调函数
+        this.$socket.registerCallBack('hotData', this.getData)
+    },
     mounted() {
         this.initChart()
-        this.getData()
+        // this.getData()
+        this.$socket.send({
+            action: 'getData',
+            socketType: 'hotData',
+            chartName: 'hotproduct',
+            value: ''
+        })
         // 监听浏览器窗口大小变化
         window.addEventListener('resize', this.screenAdapter)
         // 根据初始窗口大小自适应
@@ -45,6 +55,8 @@ export default {
     destroyed() {
         // 停止监听窗口变化，防止内存泄露
         window.removeEventListener('resize', this.screenAdapter)
+        // 组件销毁时取消回调函数
+        this.$socket.unRegisterCallBack("hotData")
     },
     methods: {
         // 初始化echarts对象
@@ -97,8 +109,8 @@ export default {
             this.charInstance.setOption(initOption)
         },
         // 从服务器获取数据
-        async getData() {
-            const {data: res} = await this.$http.get('/hotproduct')
+        getData(res) {
+            // const {data: res} = await this.$http.get('/hotproduct')
             this.Data = res
             // 获取数据后渲染到图表
             this.updateChart()

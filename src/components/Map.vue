@@ -15,9 +15,19 @@ export default {
             mapData: {} //用于缓存读取到的省份地图矢量数据
         }
     },
+    created() {
+        // 组件创建时注册回调函数
+        this.$socket.registerCallBack('mapData', this.getData)
+    },
     mounted() {
         this.initChart()
-        this.getData()
+        // this.getData()
+        this.$socket.send({
+            action: 'getData',
+            socketType: 'mapData',
+            chartName: 'map',
+            value: ''
+        })
         // 监听浏览器窗口大小变化
         window.addEventListener('resize', this.screenAdapter)
         // 根据初始窗口大小自适应
@@ -26,6 +36,8 @@ export default {
     destroyed() {
         // 停止监听窗口变化，防止内存泄露
         window.removeEventListener('resize', this.screenAdapter)
+         // 组件销毁时取消回调函数
+        this.$socket.unRegisterCallBack("mapData")
     },
     methods: {
         // 初始化echarts对象
@@ -74,9 +86,9 @@ export default {
             })
         },
         // 从服务器获取数据
-        async getData() {
+        getData(res) {
             // 获取数据后渲染到图表
-            const { data: res } = await this.$http.get('/map')
+            // const { data: res } = await this.$http.get('/map')
             this.Data = res
             console.log(res);
             this.updateChart()
