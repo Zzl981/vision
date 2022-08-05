@@ -42,24 +42,23 @@ export default class SocketService {
 
         this.ws.onmessage = (msg) => {
             console.log('接收到服务端数据');
-            // console.log(msg.data);
             // 将字符串数据转为JSON字符串数据
-            const recData = JSON.parse(msg.data)
+            const recvData = JSON.parse(msg.data)
             // 判断什么类型的数据
-            const socketType = recData.socketType
+            const socketType = recvData.socketType
             // 若存在相应的回调函数
             if (this.callBackMapping[socketType]) {
                 // 获取action值
-                const action = recData.action
+                const action = recvData.action
                 if (action === 'getData') {
                     // 将真正的图表数据转为JSON格式
-                    const realData = JSON.parse(recData.data)
+                    const realData = JSON.parse(recvData.data)
                     // 调用回调函数
                     this.callBackMapping[socketType].call(this, realData)
                 } else if (action === 'fullScreen') {
-
+                    this.callBackMapping[socketType].call(this, recvData)
                 } else {
-
+                    this.callBackMapping[socketType].call(this, recvData)
                 }
             }
         }
