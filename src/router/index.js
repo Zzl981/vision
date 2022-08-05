@@ -3,6 +3,7 @@ import VueRouter from 'vue-router'
 import SellerPage from '@/views/SellerPage'
 import MapPage from '@/views/MapPage'
 import TrendPage from '@/views/TrendPage'
+import RankPage from '@/views/RankPage'
 
 Vue.use(VueRouter)
 
@@ -18,6 +19,10 @@ const routes = [
   {
     path: '/trendpage',
     component: TrendPage
+  },
+  {
+    path: '/rankpage',
+    component: RankPage
   }
 ]
 
