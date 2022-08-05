@@ -5,14 +5,15 @@
 </template>
 
 <script>
-
+import { mapState } from 'vuex'
 export default {
     data() {
         return {
             charInstance: null,
             Data: null,
             currentIndex: 0,
-            Timer: null
+            Timer: null,
+            Size: 0
         }
     },
     created() {
@@ -31,7 +32,7 @@ export default {
         // 监听浏览器窗口大小变化
         window.addEventListener('resize', this.screenAdapter)
         // 根据初始窗口大小自适应
-        this.screenAdapter()
+        this.screenAdapter(2.8)
     },
     destroyed() {
         // 停止监听窗口变化，防止内存泄露
@@ -39,10 +40,26 @@ export default {
         clearInterval(this.Timer)
         this.$socket.unRegisterCallBack("stockData")
     },
+    computed: {
+        // 定义theme计算属性
+        ...mapState(['theme'])
+    },
+    watch: {
+        theme() {
+            // 销毁原来的主题
+            this.charInstance.dispose()
+            // 以最新的主题重新初始化图表
+            this.initChart()
+            // 重新调整自适应大小
+            this.screenAdapter(2)
+            // 更新图表
+            this.updateChart()
+        }
+    },
     methods: {
         // 初始化echarts对象
         initChart() {
-            this.charInstance = this.$echarts.init(this.$refs.stock_ref, 'chalk')
+            this.charInstance = this.$echarts.init(this.$refs.stock_ref, this.theme)
             const initOption = {
                 title: {
                     text: '▎ 库存与销量分析',
@@ -87,7 +104,6 @@ export default {
             const seriesArr = showData.map((item, index) => {
                 return {
                     type: 'pie',
-                    radius: [110, 100],
                     center: centerArr[index],
                     // 关闭鼠标移入圆环时的动画效果
                     hoverAnimation: false,
@@ -96,7 +112,7 @@ export default {
                         position: 'center',
                         color: colorArr[index][0],
                         formatter: item.name + '\n' + item.sales,
-                        lineHeight: 30
+                        lineHeight: 22
                     },
                     // 去掉指示线
                     labelLine: {
@@ -135,13 +151,13 @@ export default {
             this.charInstance.setOption(dataOption)
         },
         screenAdapter() {
-            const Size = this.$refs.stock_ref.offsetWidth / 100 * 3.6
-            const innerRadius = Size * 2
+            this.Size = this.$refs.stock_ref.offsetWidth / 100 * 3.6
+            const innerRadius = this.Size * 2.4
             const outterRadius = innerRadius * 1.125
             const adapterOption = {
                 title: {
                     textStyle: {
-                        fontSize: Size
+                        fontSize: this.Size
                     }
                 },
                 series: [
@@ -149,35 +165,35 @@ export default {
                         type: 'pie',
                         radius: [outterRadius, innerRadius],
                         label: {
-                            fontSize: Size / 2
+                            fontSize: this.Size / 2
                         }
                     },
                     {
                         type: 'pie',
                         radius: [outterRadius, innerRadius],
                         label: {
-                            fontSize: Size / 2
+                            fontSize: this.Size / 2
                         }
                     },
                     {
                         type: 'pie',
                         radius: [outterRadius, innerRadius],
                         label: {
-                            fontSize: Size / 2
+                            fontSize: this.Size / 2
                         }
                     },
                     {
                         type: 'pie',
                         radius: [outterRadius, innerRadius],
                         label: {
-                            fontSize: Size / 2
+                            fontSize: this.Size / 2
                         }
                     },
                     {
                         type: 'pie',
                         radius: [outterRadius, innerRadius],
                         label: {
-                            fontSize: Size / 2
+                            fontSize: this.Size / 2
                         }
                     },
                 ]

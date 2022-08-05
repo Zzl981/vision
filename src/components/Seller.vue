@@ -5,7 +5,7 @@
 </template>
 
 <script>
-
+import { mapState } from 'vuex'
 export default {
     data() {
         return {
@@ -43,15 +43,31 @@ export default {
         // 组件销毁时取消回调函数
         this.$socket.unRegisterCallBack("sellerData")
     },
+    computed: {
+        // 定义theme计算属性
+        ...mapState(['theme'])
+    },
+    watch: {
+        theme() {
+            // 销毁原来的主题
+            this.charInstance.dispose()
+            // 以最新的主题重新初始化图表
+            this.initChart()
+            // 重新调整自适应大小
+            this.screenAdapter()
+            // 更新图表
+            this.updateChart()
+        }
+    },
     methods: {
         // 初始化echarts对象
         initChart() {
-            this.charInstance = this.$echarts.init(this.$refs.seller_ref, 'chalk')
+            this.charInstance = this.$echarts.init(this.$refs.seller_ref, this.theme)
             const initOption = {
                 title: {
                     text: '▎商家销售统计',
                     left: 20,
-                    top: 20
+                    top: 15
                 },
                 animationEasing: 'circularOut',
                 grid: {

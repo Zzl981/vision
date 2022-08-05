@@ -7,6 +7,7 @@
 <script>
 import axios from 'axios'
 import { getProvinceMapInfo } from '@/utils/map_utils'
+import { mapState } from 'vuex'
 export default {
     data() {
         return {
@@ -39,10 +40,26 @@ export default {
          // 组件销毁时取消回调函数
         this.$socket.unRegisterCallBack("mapData")
     },
+    computed: {
+        // 定义theme计算属性
+        ...mapState(['theme'])
+    },
+    watch: {
+        theme() {
+            // 销毁原来的主题
+            this.charInstance.dispose()
+            // 以最新的主题重新初始化图表
+            this.initChart()
+            // 重新调整自适应大小
+            this.screenAdapter()
+            // 更新图表
+            this.updateChart()
+        }
+    },
     methods: {
         // 初始化echarts对象
         async initChart() {
-            this.charInstance = this.$echarts.init(this.$refs.map_ref, 'chalk')
+            this.charInstance = this.$echarts.init(this.$refs.map_ref, this.theme)
             const res = await axios.get('http://127.0.0.1:8080/static/map/china.json')
             this.$echarts.registerMap('china', res.data)
             const initOption = {
@@ -90,7 +107,6 @@ export default {
             // 获取数据后渲染到图表
             // const { data: res } = await this.$http.get('/map')
             this.Data = res
-            console.log(res);
             this.updateChart()
         },
         // 渲染数据
@@ -112,7 +128,6 @@ export default {
             const legendData = this.Data.map(item => {
                 return item.name
             })
-            console.log(legendData);
             var dataOption = {
                 legend: {
                     data: legendData

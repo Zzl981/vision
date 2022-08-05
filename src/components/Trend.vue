@@ -15,7 +15,8 @@
 </template>
 
 <script>
-
+import { mapState } from 'vuex'
+import { getThemeValue } from '@/utils/theme_utils'
 export default {
     data() {
         return {
@@ -78,20 +79,36 @@ export default {
         // 标题大小自适应
         comStyle() {
             return {
-                fontSize: this.Size + 'px'
+                fontSize: this.Size + 'px',
+                color: getThemeValue(this.theme).titleColor
             }
         },
         // 下拉框的左外边距，下拉时与当前显示的标题对齐
         marginStyle() {
             return {
-                marginLeft: this.Size - 3 + 'px'
+                marginLeft: this.Size - 3 + 'px',
+                backgroundColor: getThemeValue(this.theme).selectColor
             }
+        },
+        // 定义theme计算属性
+        ...mapState(['theme'])
+    },
+    watch: {
+        theme() {
+            // 销毁原来的主题
+            this.charInstance.dispose()
+            // 以最新的主题重新初始化图表
+            this.initChart()
+            // 重新调整自适应大小
+            this.screenAdapter()
+            // 更新图表
+            this.updateChart()
         }
     },
     methods: {
         // 初始化echarts对象
         initChart() {
-            this.charInstance = this.$echarts.init(this.$refs.trend_ref, 'chalk')
+            this.charInstance = this.$echarts.init(this.$refs.trend_ref, this.theme)
             const initOption = {
                 xAxis: {
                     type: 'category',
