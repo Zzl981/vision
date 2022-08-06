@@ -99,6 +99,8 @@ export default {
             this.charInstance.dispose()
             // 以最新的主题重新初始化图表
             this.initChart()
+            // 隐藏加载动画
+            this.charInstance.hideLoading()
             // 重新调整自适应大小
             this.screenAdapter()
             // 更新图表
@@ -109,6 +111,8 @@ export default {
         // 初始化echarts对象
         initChart() {
             this.charInstance = this.$echarts.init(this.$refs.trend_ref, this.theme)
+            // 请求数据前显示加载数据中动画
+            this.charInstance.showLoading()
             const initOption = {
                 xAxis: {
                     type: 'category',
@@ -143,6 +147,8 @@ export default {
         },
         // 从服务器获取数据
         getData(res) {
+            // 隐藏加载动画
+            this.charInstance.hideLoading()
             // const { data: res } = await this.$http.get('/trend')
             this.Data = res
             // 获取数据后渲染到图表

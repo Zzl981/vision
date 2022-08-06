@@ -50,6 +50,8 @@ export default {
             this.charInstance.dispose()
             // 以最新的主题重新初始化图表
             this.initChart()
+            // 隐藏加载动画
+            this.charInstance.hideLoading()
             // 重新调整自适应大小
             this.screenAdapter()
             // 更新图表
@@ -60,6 +62,8 @@ export default {
         // 初始化echarts对象
         async initChart() {
             this.charInstance = this.$echarts.init(this.$refs.map_ref, this.theme)
+            // 请求数据前显示加载数据中动画
+            this.charInstance.showLoading()
             const res = await axios.get('http://127.0.0.1:8080/static/map/china.json')
             this.$echarts.registerMap('china', res.data)
             const initOption = {
@@ -104,6 +108,8 @@ export default {
         },
         // 从服务器获取数据
         getData(res) {
+            // 隐藏加载动画
+            this.charInstance.hideLoading()
             // 获取数据后渲染到图表
             // const { data: res } = await this.$http.get('/map')
             this.Data = res
